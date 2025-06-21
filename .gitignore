@@ -1,0 +1,31 @@
+# Bytecode cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# VSCode settings (optional)
+.vscode/
+
+# Mac & Linux junk
+.DS_Store
+*.swp
+
+# Logs & outputs
+*.log
+*.tmp
+results/
+
+# PyInstaller / Build artifacts
+dist/
+build/
+*.spec
+
+# Test cache
+.pytest_cache/
+
+# Jupyter Notebooks (if ever used)
+.ipynb_checkpoints/
