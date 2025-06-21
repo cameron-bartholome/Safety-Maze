@@ -61,3 +61,13 @@ python main.py
 ## 📣 Notes
 This project is in development and designed to scale across stages.  
 Feel free to explore the layout or adapt the modular structure for your own simulation projects.
+
+---
+
+## 🔒 License
+
+This project is licensed under the **Creative Commons Attribution-NonCommercial 4.0 International License**.
+
+You may share, adapt, or build upon this project **non-commercially**, as long as you give proper credit.  
+🔗 [View full license](https://creativecommons.org/licenses/by-nc/4.0/)
+
