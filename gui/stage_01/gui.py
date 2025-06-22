@@ -51,8 +51,24 @@ def run_stage1_gui():
     ttk.Label(control_frame, text="Laser Power").pack(pady=(15, 5))
     tk.Entry(control_frame).pack()
 
-    ttk.Label(control_frame, text="Beam Angle").pack(pady=(15, 5))
-    tk.Entry(control_frame).pack()
+    # Beam angle input [DEV-2025-06-22-01 User Input Handling]
+
+    angle_label = tk.Label(control_frame, text="Beam Angle (0° - 180°):")
+    angle_label.pack(pady=(15, 0))
+
+    beam_angle = tk.IntVar(value=45)
+
+    angle_entry = tk.Entry(control_frame, textvariable=beam_angle, width=5, justify="center")
+    angle_entry.pack()
+
+    angle_btn_frame = tk.Frame(control_frame)
+    angle_btn_frame.pack(pady=(5, 15))
+
+    tk.Button(angle_btn_frame, text="◀", width=2,
+              command=lambda: beam_angle.set(max(0, beam_angle.get() - 1))).pack(side="left")
+    tk.Button(angle_btn_frame, text="▶", width=2,
+              command=lambda: beam_angle.set(min(180, beam_angle.get() + 1))).pack(side="left")
+
 
     # Buttons
     btn_frame = tk.Frame(control_frame)
