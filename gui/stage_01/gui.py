@@ -53,9 +53,9 @@ def run_stage1_gui():
 
     # DEV-2025-22-04 Stage 1 add beam simulation
     # DEV-2025-22-05 Stage 1 Fix beam direction orientation
+    #---------------------------------------------------------------------------------
     def update_display():
-        """Update maze, starting point,
-        beam path and reflection count."""
+        """Update maze, starting point, beam path and reflection count."""
         selected = maze_selector.get()
         angle = beam_angle.get()
 
@@ -65,27 +65,28 @@ def run_stage1_gui():
         canvas.delete("all")
 
         # Draw maze walls
-        for line in get_maze_lines(selected):
-            canvas.create_line(*line[0], *line[1], width=4)
-
-        # Get start point
-        start = start_points.get(selected, (0, 0))
         maze_lines = get_maze_lines(selected)
-        orientation = direction_modes.get(selected, "vertical")
-        path, _ = trace_beam_path(start, angle, maze_lines, canvas_size, orientation)
+        for (x1, y1), (x2, y2) in maze_lines:
+            canvas.create_line(x1, y1, x2, y2, fill="black", width=2)
 
-        # Draw beam path
+        # Get orientation + trace beam
+        start = start_points.get(selected, (0, 0))
+        orientation = direction_modes.get(selected, "vertical")
+        path, reflections = trace_beam_path(start, angle, maze_lines, canvas_size, orientation)
+
+        # Draw beam path and mark reflections
         for i in range(len(path) - 1):
             canvas.create_line(*path[i], *path[i+1], fill="red", width=2)
+            if i != 0:  # Only mark reflection points, not the first
+                rx, ry = path[i]
+                canvas.create_oval(rx - 3, ry - 3, rx + 3, ry + 3, fill="blue")
 
-        # Draw starting dot
+        # Draw starting point (green)
         x0, y0 = start
-        canvas.create_oval(x0 - 3, y0 - 3, x0 + 3, y0 + 3, fill="blue")
+        canvas.create_oval(x0 - 3, y0 - 3, x0 + 3, y0 + 3, fill="green")
 
-
-        # Update reflection count
-        reflection_label.config(text=str(len(path) - 2))  # -2 because 1 start + 1 exit
-
+        # Show reflection count
+        reflection_label.config(text=str(reflections))
 
     # Controls (right)
     control_frame = tk.Frame(main_frame)
