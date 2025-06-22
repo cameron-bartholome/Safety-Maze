@@ -7,8 +7,29 @@ import tkinter as tk
 from tkinter import ttk
 from stages.stage_01_core import get_maze_lines
 from stages.stage_01_core import trace_beam_path
+#-------------------------------------------------------------------------
 
+start_points = { # DEV-2025-22-02 Beam start point maze selection
+            "Maze 1 - Straight": (300, 400),
+            "Maze 2 - L Shape": (375, 400),
+            "Maze 3A - Z Shape": (175, 400),
+            "Maze 3B - U Shape": (175, 400),
+            "Maze 4A - Snake Shape": (100, 325),
+            "Maze 4B - Stair Shape": (150, 325)
+        }
 
+# Direction modes: "horizontal" (default) or "vertical"
+# DEV-2025-22-05 Stage 1 Fix beam direction orientation
+direction_modes = {
+    "Maze 1 - Straight": "vertical",
+    "Maze 2 - L Shape": "vertical",
+    "Maze 3A - Z Shape": "vertical",
+    "Maze 3B - U Shape": "vertical",
+    "Maze 4A - Snake Shape": "horizontal",
+    "Maze 4B - Stair Shape": "horizontal"
+}
+
+#-------------------------------------------------------------------------
 def run_stage1_gui():
     """Launches the Stage 1 GUI window for the Safety Maze application."""
 
@@ -31,6 +52,7 @@ def run_stage1_gui():
     canvas.pack(fill="both", expand=True)
 
     # DEV-2025-22-04 Stage 1 add beam simulation
+    # DEV-2025-22-05 Stage 1 Fix beam direction orientation
     def update_display():
         """Update maze, starting point,
         beam path and reflection count."""
@@ -46,19 +68,20 @@ def run_stage1_gui():
         for line in get_maze_lines(selected):
             canvas.create_line(*line[0], *line[1], width=4)
 
-        # Get beam path
+        # Get start point
+        start = start_points.get(selected, (0, 0))
         maze_lines = get_maze_lines(selected)
-        path = trace_beam_path(selected, angle, maze_lines, canvas_size)
+        orientation = direction_modes.get(selected, "vertical")
+        path, _ = trace_beam_path(start, angle, maze_lines, canvas_size, orientation)
 
         # Draw beam path
         for i in range(len(path) - 1):
             canvas.create_line(*path[i], *path[i+1], fill="red", width=2)
 
-
         # Draw starting dot
-        if isinstance(path[0], (list, tuple)) and len(path[0]) == 2:
-            x0, y0 = path[0]
-            canvas.create_oval(x0 - 3, y0 - 3, x0 + 3, y0 + 3, fill="blue")
+        x0, y0 = start
+        canvas.create_oval(x0 - 3, y0 - 3, x0 + 3, y0 + 3, fill="blue")
+
 
         # Update reflection count
         reflection_label.config(text=str(len(path) - 2))  # -2 because 1 start + 1 exit
@@ -99,15 +122,6 @@ def run_stage1_gui():
         for line in get_maze_lines(selected):
             canvas.create_line(*line[0], *line[1], width=4)
 
-        start_points = { # DEV-2025-22-02 Beam start point maze selection
-            "Maze 1 - Straight": (300, 400),
-            "Maze 2 - L Shape": (375, 400),
-            "Maze 3A - Z Shape": (175, 400),
-            "Maze 3B - U Shape": (175, 400),
-            "Maze 4A - Snake Shape": (100, 325),
-            "Maze 4B - Stair Shape": (150, 325)
-        }
-
         x, y = start_points.get(selected, (0, 0))
         canvas.create_oval(x-3, y-3, x+3, y+3, fill="red", tags="start")
 
@@ -122,9 +136,6 @@ def run_stage1_gui():
 
     maze_selector.pack()
     maze_selector.bind("<<ComboboxSelected>>", on_maze_select)
-
-    # DEV-2025-22-04 Stage 1 add beam simulation
-    tk.Button(center_controls, text="Simulate Beam", command=update_display).pack(pady=(10, 0))
 
 
     # Beam angle input [DEV-2025-06-22-01 User Input Handling]
@@ -146,6 +157,8 @@ def run_stage1_gui():
     tk.Button(angle_btn_frame, text="▶", width=2,
               command=lambda: beam_angle.set(min(180, beam_angle.get() + 1))).pack(side="left")
 
+    # DEV-2025-22-04 Stage 1 add beam simulation
+    tk.Button(center_controls, text="Simulate Beam", command=update_display).pack(pady=(10, 0))
 
     # Reflection output
     ttk.Label(center_controls, text="Reflections:",

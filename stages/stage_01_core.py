@@ -99,8 +99,8 @@ def get_maze_lines(maze_name: str):
     """Returns a list of lines for the selected maze preset."""
     return maze_presets.get(maze_name, [])
 
-#DEV-2025-22-04 Stage 1 add beam simulation
-def trace_beam_path(start, angle_deg, _maze_lines, _canvas_size):
+# DEV-2025-22-04 Stage 1 add beam simulation
+def trace_beam_path(start, angle_deg, _maze_lines, _canvas_size, orientation="vertical"):
     """
     Traces the beam from a start point at a given angle,
     reflecting off lines in the maze until it exits the canvas.
@@ -112,10 +112,16 @@ def trace_beam_path(start, angle_deg, _maze_lines, _canvas_size):
     path = [start]
     reflections = 0
 
+    # DEV-2025-06-22-03 Orientation correction
+    if orientation == "vertical":
+        angle_deg = 180 - angle_deg  # Flip left/right
+    elif orientation == "horizontal":
+        angle_deg = (90 - angle_deg) % 360  # Flip up/down
+
     # Convert angle to direction vector
     angle_rad = math.radians(angle_deg)
     dx = math.cos(angle_rad)
-    dy = math.sin(angle_rad)
+    dy = -math.sin(angle_rad)
 
     # Placeholder: move beam in straight line until it exits canvas
     x, y = start
