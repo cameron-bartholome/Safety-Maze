@@ -2,6 +2,7 @@
 Stage 1 Core Logic – Safety Maze
 Handles maze presets and related logic for Stage 1.
 """
+import math
 
 # LABYRINTH PRESETS
 
@@ -97,3 +98,30 @@ maze_presets = {
 def get_maze_lines(maze_name: str):
     """Returns a list of lines for the selected maze preset."""
     return maze_presets.get(maze_name, [])
+
+#DEV-2025-22-04 Stage 1 add beam simulation
+def trace_beam_path(start, angle_deg, _maze_lines, _canvas_size):
+    """
+    Traces the beam from a start point at a given angle,
+    reflecting off lines in the maze until it exits the canvas.
+
+    Returns:
+        path (list): Points the beam travels through
+        reflections (int): Number of times it bounced
+    """
+    path = [start]
+    reflections = 0
+
+    # Convert angle to direction vector
+    angle_rad = math.radians(angle_deg)
+    dx = math.cos(angle_rad)
+    dy = math.sin(angle_rad)
+
+    # Placeholder: move beam in straight line until it exits canvas
+    x, y = start
+    while 0 <= x <= _canvas_size[0] and 0 <= y <= _canvas_size[1]:
+        x += dx * 5  # small step
+        y += dy * 5
+        path.append((x, y))
+
+    return path, reflections
