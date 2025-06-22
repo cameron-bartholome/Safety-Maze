@@ -47,10 +47,6 @@ def run_stage1_gui():
     maze_selector.pack()
     maze_selector.bind("<<ComboboxSelected>>", on_maze_select)
 
-    # Laser input fields
-    ttk.Label(control_frame, text="Laser Power").pack(pady=(15, 5))
-    tk.Entry(control_frame).pack()
-
     # Beam angle input [DEV-2025-06-22-01 User Input Handling]
 
     angle_label = tk.Label(control_frame, text="Beam Angle (0° - 180°):")
@@ -68,13 +64,6 @@ def run_stage1_gui():
               command=lambda: beam_angle.set(max(0, beam_angle.get() - 1))).pack(side="left")
     tk.Button(angle_btn_frame, text="▶", width=2,
               command=lambda: beam_angle.set(min(180, beam_angle.get() + 1))).pack(side="left")
-
-
-    # Buttons
-    btn_frame = tk.Frame(control_frame)
-    btn_frame.pack(pady=20)
-    tk.Button(btn_frame, text="Reset").pack(side="left", padx=5)
-    tk.Button(btn_frame, text="Run").pack(side="left", padx=5)
 
     # Reflection output
     ttk.Label(control_frame, text="Reflections:").pack(pady=(10, 0))
