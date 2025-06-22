@@ -13,7 +13,7 @@ def run_stage1_gui():
 
     root = tk.Tk()
     root.title("Safety Maze Stage 1")
-    root.geometry("900x600")
+    root.geometry("840x500")
     root.resizable(False, False)
 
     main_frame = tk.Frame(root)
@@ -28,20 +28,53 @@ def run_stage1_gui():
     canvas = tk.Canvas(left_panel, width=600, height=500, bg="white")
     canvas.pack(fill="both", expand=True)
 
+
     # Controls (right)
     control_frame = tk.Frame(main_frame)
     control_frame.grid(row=0, column=1, sticky="ns", padx=10)
+
+    #Top Heading: Safety Maze Title
+    heading_wrapper = tk.Frame(control_frame)
+    heading_wrapper.pack(expand=True)  # Takes vertical space to help center it
+
+    heading_frame = tk.Frame(heading_wrapper)
+    heading_frame.pack(pady=(0, 30))
+
+    tk.Label(heading_frame, text="Safety Maze", font=("TkDefaultFont", 14, "bold")).pack()
+    tk.Label(heading_frame, text="Stage", font=("TkDefaultFont", 10)).pack(pady=(5, 0))
+
+    stage_box = tk.Label(
+        heading_frame, text="1", font=("TkDefaultFont", 18, "bold"),
+        width=4, height=2, relief="ridge", borderwidth=2)
+    stage_box.pack(pady=(2, 0))
+
     # Centered inner frame for better layout
     center_controls = tk.Frame(control_frame)
-    center_controls.pack(expand=True)
+    center_controls.pack(expand=True, pady=(0,30))
 
 
     # EVENT HANDLER
-    def on_maze_select(_event):
+    def on_maze_select(_event=None):
         selected = maze_selector.get()
+        if not selected:
+            return
+
         canvas.delete("all")
+
         for line in get_maze_lines(selected):
             canvas.create_line(*line[0], *line[1], width=4)
+
+        start_points = { # DEV-2025-22-02 Beam start point maze selection
+            "Maze 1 - Straight": (300, 400),
+            "Maze 2 - L Shape": (375, 400),
+            "Maze 3A - Z Shape": (175, 400),
+            "Maze 3B - U Shape": (175, 400),
+            "Maze 4A - Snake Shape": (100, 325),
+            "Maze 4B - Stair Shape": (150, 325)
+        }
+
+        x, y = start_points.get(selected, (0, 0))
+        canvas.create_oval(x-3, y-3, x+3, y+3, fill="red", tags="start")
 
 
     # Maze dropdown
