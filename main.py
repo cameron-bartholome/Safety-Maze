@@ -8,10 +8,6 @@ Author: CB
 Date: 2025-06-21
 """
 
-# === DEV LOG LINKS ===
-# Related Dev Notes:
-# - [DEV-2025-06-21-02] Python App File Structure Update
-
 
 from gui.stage_01.gui import run_stage1_gui
 

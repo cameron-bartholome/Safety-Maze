@@ -109,8 +109,6 @@ def trace_beam_path(start, angle_deg, _maze_lines, _canvas_size, orientation="ve
         path (list): Points the beam travels through
         reflections (int): Number of times it bounced
     """
-    path = [start]
-    reflections = 0
 
     # DEV-2025-06-22-03 Orientation correction
     if orientation == "vertical":
@@ -123,50 +121,18 @@ def trace_beam_path(start, angle_deg, _maze_lines, _canvas_size, orientation="ve
     dx = math.cos(angle_rad)
     dy = -math.sin(angle_rad)
 
-    # DEV-2025-22-06 Stage 1 Fix false reflection count when laser goes off-screen
-    x, y = start
-    max_bounces = 100  # safety limit
-    while 0 <= x <= _canvas_size[0] and 0 <= y <= _canvas_size[1] and reflections < max_bounces:
-        next_x = x + dx * 5
-        next_y = y + dy * 5
+    # DEV-2025-23-01 Remove beam Logic to start over
+    path = [start]
 
-        hit = False
-        for wall in _maze_lines:
-            (x1, y1), (x2, y2) = wall
-            denom = (x2 - x1) * (y - next_y) - (y2 - y1) * (x - next_x)
-            if denom == 0:
-                continue  # parallel
+    angle_rad = math.radians(angle_deg)
+    dx = math.cos(angle_rad)
+    dy = -math.sin(angle_rad)
 
-            ua = ((x2 - x1) * (y1 - y) - (y2 - y1) * (x1 - x)) / denom
-            ub = ((next_x - x) * (y1 - y) - (next_y - y) * (x1 - x)) / denom
+    # Shoot a long line from the start point
+    end_x = start[0] + dx * 1000
+    end_y = start[1] + dy * 1000
+    path.append((end_x, end_y))
 
-            if 0 <= ua <= 1 and 0 <= ub <= 1:
-                ix = x + ua * (next_x - x)
-                iy = y + ua * (next_y - y)
-                path.append((ix, iy))
-                reflections += 1
-
-                wall_dx = x2 - x1
-                wall_dy = y2 - y1
-                length = math.hypot(wall_dx, wall_dy)
-                nx = -wall_dy / length
-                ny = wall_dx / length
-                dot = dx * nx + dy * ny
-                dx -= 2 * dot * nx
-                dy -= 2 * dot * ny
-
-                x, y = ix, iy
-                hit = True
-                break
-
-        if hit:
-            continue  # Already updated x, y and path when hitting wall
-        else:
-            # Only append the last point when it exits the canvas
-            x = next_x
-            y = next_y
-            if 0 <= x <= _canvas_size[0] and 0 <= y <= _canvas_size[1]:
-                path.append((x, y))
-
+    reflections = 0  # Placeholder, not used yet
 
     return path, reflections
