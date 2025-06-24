@@ -101,43 +101,69 @@ def get_maze_lines(maze_name: str):
     return maze_presets.get(maze_name, [])
 
 # DEV-2025-22-04 Stage 1 add beam simulation
-def trace_beam_path(start, angle_deg, maze_lines, _canvas_size, orientation="vertical"):
-    """
-    DEV-2025-24-01 Beam logic step 1: shoot beam from start point and stop at first wall hit.
-    """
-
-    # Flip angle based on orientation
+# DEV-2025-24-02 Trace beam function for beam logic
+def trace_beam_path(start, angle_deg, maze_lines, canvas_size, orientation="vertical"):
     if orientation == "vertical":
         angle_deg = 180 - angle_deg
     elif orientation == "horizontal":
         angle_deg = (90 - angle_deg) % 360
 
-    # Convert angle to direction
     angle_rad = math.radians(angle_deg)
     dx = math.cos(angle_rad)
     dy = -math.sin(angle_rad)
 
-    # Extend beam line far out
-    end_point = (start[0] + dx * 1000, start[1] + dy * 1000)
-    beam_line = LineString([start, end_point])
+    width, height = canvas_size
+    path = [start]
+    x, y = start
+    max_bounces = 50
+    reflections = 0
 
-    closest_hit = None
-    closest_dist = float("inf")
+    for _ in range(max_bounces):
+        end = (x + dx * 1000, y + dy * 1000)
+        beam_line = LineString([ (x, y), end ])
+        closest_hit = None
+        closest_wall = None
+        closest_dist = float("inf")
 
-    for wall in maze_lines:
-        wall_line = LineString(wall)
-        if beam_line.intersects(wall_line):
-            intersect = beam_line.intersection(wall_line)
-            if not intersect.is_empty:
-                px, py = intersect.x, intersect.y
-                dist = (px - start[0])**2 + (py - start[1])**2
+        for wall in maze_lines:
+            wall_line = LineString(wall)
+            if beam_line.intersects(wall_line):
+                inter = beam_line.intersection(wall_line)
+                if inter.is_empty or not hasattr(inter, 'x'):
+                    continue
+                px, py = inter.x, inter.y
+                dist = (px - x)**2 + (py - y)**2
                 if dist < closest_dist:
                     closest_hit = (px, py)
+                    closest_wall = wall
                     closest_dist = dist
 
-    # Build path
-    path = [start]
-    if closest_hit:
-        path.append(closest_hit)
+        if closest_hit:
+            path.append(closest_hit)
+            reflections += 1
+            x, y = closest_hit
 
-    return path, 0  # No reflections yet
+            # Calculate reflection
+            (x1, y1), (x2, y2) = closest_wall
+            wall_dx = x2 - x1
+            wall_dy = y2 - y1
+            wall_length = math.hypot(wall_dx, wall_dy)
+            nx = -wall_dy / wall_length
+            ny = wall_dx / wall_length
+            dot = dx * nx + dy * ny
+            dx -= 2 * dot * nx
+            dy -= 2 * dot * ny
+
+        else:
+            # No hit, beam exits canvas
+            out_x = x + dx * 1000
+            out_y = y + dy * 1000
+            path.append((out_x, out_y))
+            break
+
+        # Stop if beam is out of canvas
+        if not (0 <= x <= width and 0 <= y <= height):
+            break
+
+    return path, reflections
+

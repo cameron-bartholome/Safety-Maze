@@ -90,9 +90,11 @@ def run_stage1_gui():
         # Draw beam path and mark reflections
         for i in range(len(path) - 1):
             canvas.create_line(*path[i], *path[i+1], fill="red", width=2)
-            if i != 0:  # Only mark reflection points, not the first
-                rx, ry = path[i]
-                canvas.create_oval(rx - 3, ry - 3, rx + 3, ry + 3, fill="blue")
+
+        # Draw blue dot at first hit (if exists)
+        if len(path) > 1:
+            rx, ry = path[1]
+            canvas.create_oval(rx - 4, ry - 4, rx + 4, ry + 4, fill="blue", outline="white")
 
         # Draw starting point (green)
         x0, y0 = start
