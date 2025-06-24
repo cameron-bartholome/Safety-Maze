@@ -47,9 +47,21 @@ def run_stage1_gui():
     # Canvas (left)
     left_panel = tk.Frame(main_frame, width=600, height=500, bg="pink")
     left_panel.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
-    canvas = tk.Canvas(left_panel, width=600, height=500, bg="white")
+    canvas = tk.Canvas(left_panel, width=620, height=520, bg="white")
     canvas_size = (600, 500)  # Global canvas size for simulation logic
     canvas.pack(fill="both", expand=True)
+
+    # Canvas Grid Lines
+    def draw_grid(canvas, size, spacing=50):
+        width, height = size
+        for x in range(0, width, spacing):
+            canvas.create_line(x, 0, x, height, fill="#e0e0e0")
+            canvas.create_text(x, 0, text=str(x), anchor="n", font=("Arial", 6), fill="#808080")
+
+        for y in range(0, height, spacing):
+            canvas.create_line(0, y, width, y, fill="#e0e0e0")
+            canvas.create_text(0, y, text=str(y), anchor="w", font=("Arial", 6), fill="#808080")
+
 
     # DEV-2025-22-04 Stage 1 add beam simulation
     # DEV-2025-22-05 Stage 1 Fix beam direction orientation
@@ -63,6 +75,7 @@ def run_stage1_gui():
             return
 
         canvas.delete("all")
+        draw_grid(canvas, canvas_size)
 
         # Draw maze walls
         maze_lines = get_maze_lines(selected)
@@ -119,6 +132,7 @@ def run_stage1_gui():
             return
 
         canvas.delete("all")
+        draw_grid(canvas, canvas_size) 
 
         for line in get_maze_lines(selected):
             canvas.create_line(*line[0], *line[1], width=4)

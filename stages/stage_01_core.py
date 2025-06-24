@@ -3,6 +3,7 @@ Stage 1 Core Logic – Safety Maze
 Handles maze presets and related logic for Stage 1.
 """
 import math
+from shapely.geometry import LineString
 
 # LABYRINTH PRESETS
 
@@ -100,39 +101,43 @@ def get_maze_lines(maze_name: str):
     return maze_presets.get(maze_name, [])
 
 # DEV-2025-22-04 Stage 1 add beam simulation
-def trace_beam_path(start, angle_deg, _maze_lines, _canvas_size, orientation="vertical"):
+def trace_beam_path(start, angle_deg, maze_lines, _canvas_size, orientation="vertical"):
     """
-    Traces the beam from a start point at a given angle,
-    reflecting off lines in the maze until it exits the canvas.
-
-    Returns:
-        path (list): Points the beam travels through
-        reflections (int): Number of times it bounced
+    DEV-2025-24-01 Beam logic step 1: shoot beam from start point and stop at first wall hit.
     """
 
-    # DEV-2025-06-22-03 Orientation correction
+    # Flip angle based on orientation
     if orientation == "vertical":
-        angle_deg = 180 - angle_deg  # Flip left/right
+        angle_deg = 180 - angle_deg
     elif orientation == "horizontal":
-        angle_deg = (90 - angle_deg) % 360  # Flip up/down
+        angle_deg = (90 - angle_deg) % 360
 
-    # Convert angle to direction vector
+    # Convert angle to direction
     angle_rad = math.radians(angle_deg)
     dx = math.cos(angle_rad)
     dy = -math.sin(angle_rad)
 
-    # DEV-2025-23-01 Remove beam Logic to start over
+    # Extend beam line far out
+    end_point = (start[0] + dx * 1000, start[1] + dy * 1000)
+    beam_line = LineString([start, end_point])
+
+    closest_hit = None
+    closest_dist = float("inf")
+
+    for wall in maze_lines:
+        wall_line = LineString(wall)
+        if beam_line.intersects(wall_line):
+            intersect = beam_line.intersection(wall_line)
+            if not intersect.is_empty:
+                px, py = intersect.x, intersect.y
+                dist = (px - start[0])**2 + (py - start[1])**2
+                if dist < closest_dist:
+                    closest_hit = (px, py)
+                    closest_dist = dist
+
+    # Build path
     path = [start]
+    if closest_hit:
+        path.append(closest_hit)
 
-    angle_rad = math.radians(angle_deg)
-    dx = math.cos(angle_rad)
-    dy = -math.sin(angle_rad)
-
-    # Shoot a long line from the start point
-    end_x = start[0] + dx * 1000
-    end_y = start[1] + dy * 1000
-    path.append((end_x, end_y))
-
-    reflections = 0  # Placeholder, not used yet
-
-    return path, reflections
+    return path, 0  # No reflections yet
