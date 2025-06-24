@@ -139,6 +139,10 @@ def trace_beam_path(start, angle_deg, maze_lines, canvas_size, orientation="vert
                     closest_dist = dist
 
         if closest_hit:
+            # New check: if beam hits *outside* canvas, stop
+            if not (0 <= closest_hit[0] <= width and 0 <= closest_hit[1] <= height):
+                path.append(closest_hit)
+                break
             path.append(closest_hit)
             reflections += 1
             x, y = closest_hit
@@ -161,9 +165,4 @@ def trace_beam_path(start, angle_deg, maze_lines, canvas_size, orientation="vert
             path.append((out_x, out_y))
             break
 
-        # Stop if beam is out of canvas
-        if not (0 <= x <= width and 0 <= y <= height):
-            break
-
     return path, reflections
-

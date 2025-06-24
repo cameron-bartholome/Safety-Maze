@@ -87,15 +87,17 @@ def run_stage1_gui():
         orientation = direction_modes.get(selected, "vertical")
         path, reflections = trace_beam_path(start, angle, maze_lines, canvas_size, orientation)
 
-        # Draw beam path and mark reflections
+#---------------------------------------------------------------------------------------------------
+        # Draw all red beam segments
         for i in range(len(path) - 1):
             canvas.create_line(*path[i], *path[i+1], fill="red", width=2)
 
-        # Draw blue dot at first hit (if exists)
-        if len(path) > 1:
-            rx, ry = path[1]
+        # Draw blue dots at all hit points (excluding start and final exit)
+        for i in range(1, len(path) - 1):
+            rx, ry = path[i]
             canvas.create_oval(rx - 4, ry - 4, rx + 4, ry + 4, fill="blue", outline="white")
 
+#---------------------------------------------------------------------------------------------------
         # Draw starting point (green)
         x0, y0 = start
         canvas.create_oval(x0 - 3, y0 - 3, x0 + 3, y0 + 3, fill="green")
