@@ -1,60 +1,69 @@
-# 🧪 Safety Maze – Stage 1: 2D Beam Simulation
+# 🔴 Safety Maze – Laser Reflection Simulator
 
-## 📌 Overview  
-A stage-based Python simulation tool to visualize laser beam paths in 2D labyrinths.  
-This first stage focuses on user input, maze preset visualization, and GUI structure using Tkinter.
+**Safety Maze** is a visual simulation tool that traces laser beams through a 2D maze and shows how they reflect off surfaces.  
+Designed for quick testing, learning, and debugging of beam safety paths using Python + Tkinter.
 
 ---
 
-## 🗂️ Folder Structure (Current)
+## ✅ Stage 1 – Core Simulation [Completed]
+
+This stage focused on building the basic simulation loop and getting beam reflections working with visual output.
+
+### ✔️ Features Implemented
+- [x] Tkinter-based GUI layout
+- [x] Prebuilt maze presets with selectable dropdown
+- [x] Beam input system (0°–180°)
+- [x] Surface-normal reflection logic for realistic beam bouncing
+- [x] Nudge system to prevent beam getting stuck at walls
+- [x] Logs each beam segment to `results/beam_log.csv`
+- [x] CSV includes: start/hit points, angle_in, angle_out
+- [x] GUI loads CSV and plots:
+  - Red beam lines
+  - Blue reflection dots
+  - Green start point
+- [x] Displays reflection count
+
+📦 Finalized: **2025-07-02**  
+📁 Output: `results/beam_log.csv`
+
+---
+
+## 🧪 Stage 2 – Geometry Expansion [Active]
+
+This stage adds dynamic maze shaping and begins expanding simulation depth.
+
+### 🔧 Planned Features
+- [ ] Define maze wall dimensions (gaps, segment length)
+- [ ] Support editable labyrinth presets
+- [ ] Visualize dimensional changes in the GUI
+- [ ] Load/save maze presets from file
+- [ ] Add optional surface presets (e.g. anodized aluminum)
+- [ ] Support beam width, energy decay per bounce (optional)
+
+---
+
+## 📁 File Structure
 
 ```
-safety-maze/
-├── main.py
-├── gui/
-│   └── stage_01/
-│       └── gui.py
-├── stages/
-│   └── stage_01_core.py
-├── core/                  # Reserved for shared logic across stages
-├── utils/                 # Reserved for helper functions
-├── assets/                # Images, diagrams, docs
-├── results/               # Logs, output files, future exports
-├── tests/                 # Placeholder for future unit testing
-└── README.md
+/gui.py                → GUI logic & visualization
+/stage_01_core.py      → Beam tracing logic + reflection system
+/results/beam_log.csv  → Simulation output (auto-overwritten)
+/maze_presets.py       → Predefined shapes for testing
 ```
 
 ---
 
-## 🛠️ Features Implemented
-- [x] Basic GUI layout with Tkinter
-- [x] Maze preset dropdown and canvas rendering
-- [x] Modular code split (GUI ↔ logic)
-- [x] Stage-based architecture for future upgrades
+## 🚀 Usage
 
----
-
-## 🧱 Modules Overview
-
-| File | Purpose |
-|------|---------|
-| `main.py` | App entry point |
-| `gui/stage_01/gui.py` | GUI layout and user input |
-| `stages/stage_01_core.py` | Maze presets and logic backend |
-
----
-
-## ▶️ How to Run
 ```bash
-python main.py
+pip install shapely
+python gui.py
 ```
 
----
-
-## 🔜 Planned Next Steps
-- [ ] Add beam path simulation (reflection engine)
-- [ ] Output images or logs of results
-- [ ] Create settings config to load other stages dynamically
+1. Select a maze preset  
+2. Enter a beam angle (0–180°)  
+3. Click **Simulate Beam**  
+4. View beam path, reflection count, and hit data
 
 ---
 
@@ -70,4 +79,3 @@ This project is licensed under the **Creative Commons Attribution-NonCommercial 
 
 You may share, adapt, or build upon this project **non-commercially**, as long as you give proper credit.  
 🔗 [View full license](https://creativecommons.org/licenses/by-nc/4.0/)
-
