@@ -3,6 +3,7 @@ Stage 1 Core Logic – Safety Maze
 Handles maze presets and related logic for Stage 1.
 """
 import math
+import csv
 from shapely.geometry import LineString
 
 # LABYRINTH PRESETS
@@ -100,9 +101,13 @@ def get_maze_lines(maze_name: str):
     """Returns a list of lines for the selected maze preset."""
     return maze_presets.get(maze_name, [])
 
-# DEV-2025-22-04 Stage 1 add beam simulation
-# DEV-2025-24-02 Trace beam function for beam logic
-def trace_beam_path(start, angle_deg, maze_lines, canvas_size, orientation="vertical"):
+def trace_beam_path(start, angle_deg, maze_lines,
+                    canvas_size, orientation="vertical", max_bounces=50):
+    """
+    Traces a beam through the maze and logs each segment to CSV.
+    Also returns the beam path as a list of points.
+    """
+
     if orientation == "vertical":
         angle_deg = 180 - angle_deg
     elif orientation == "horizontal":
@@ -113,56 +118,76 @@ def trace_beam_path(start, angle_deg, maze_lines, canvas_size, orientation="vert
     dy = -math.sin(angle_rad)
 
     width, height = canvas_size
-    path = [start]
     x, y = start
-    max_bounces = 50
-    reflections = 0
+    path = [start]
 
-    for _ in range(max_bounces):
-        end = (x + dx * 1000, y + dy * 1000)
-        beam_line = LineString([ (x, y), end ])
-        closest_hit = None
-        closest_wall = None
-        closest_dist = float("inf")
+    with open("beam_log.csv", mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(["start_x", "start_y", "hit_x", "hit_y", "angle_in", "angle_out"])
 
-        for wall in maze_lines:
-            wall_line = LineString(wall)
-            if beam_line.intersects(wall_line):
-                inter = beam_line.intersection(wall_line)
-                if inter.is_empty or not hasattr(inter, 'x'):
-                    continue
-                px, py = inter.x, inter.y
-                dist = (px - x)**2 + (py - y)**2
-                if dist < closest_dist:
-                    closest_hit = (px, py)
-                    closest_wall = wall
-                    closest_dist = dist
+        for _ in range(max_bounces):
+            end = (x + dx * 1000, y + dy * 1000)
+            beam_line = LineString([(x, y), end])
+            closest_hit = None
+            closest_wall = None
+            closest_dist = float("inf")
 
-        if closest_hit:
-            # New check: if beam hits *outside* canvas, stop
-            if not (0 <= closest_hit[0] <= width and 0 <= closest_hit[1] <= height):
+            for wall in maze_lines:
+                wall_line = LineString(wall)
+                if beam_line.intersects(wall_line):
+                    inter = beam_line.intersection(wall_line)
+                    if inter.is_empty or not hasattr(inter, 'x'):
+                        continue
+                    px, py = inter.x, inter.y
+                    dist = (px - x)**2 + (py - y)**2
+                    if dist < closest_dist:
+                        closest_hit = (px, py)
+                        closest_wall = wall
+                        closest_dist = dist
+
+            incoming_angle = (math.degrees(math.atan2(-dy, dx))) % 360
+
+            if closest_hit:
+                if not (0 <= closest_hit[0] <= width and 0 <= closest_hit[1] <= height):
+                    writer.writerow([x, y, closest_hit[0], closest_hit[1], incoming_angle, "EXIT"])
+                    path.append(closest_hit)
+                    break
+
                 path.append(closest_hit)
+
+                # Reflect beam using proper vector reflection
+                (x1, y1), (x2, y2) = closest_wall
+
+                # Wall unit vector
+                wall_dx = x2 - x1
+                wall_dy = y2 - y1
+                wall_length = math.hypot(wall_dx, wall_dy)
+                ux = wall_dx / wall_length
+                uy = wall_dy / wall_length
+
+                # Surface normal (perpendicular to wall)
+                nx = -uy
+                ny = ux
+
+                # Reflect the incoming direction
+                dot = dx * nx + dy * ny
+                dx = dx - 2 * dot * nx
+                dy = dy - 2 * dot * ny
+
+
+                outgoing_angle = (math.degrees(math.atan2(-dy, dx))) % 360
+                writer.writerow([x, y, closest_hit[0], closest_hit[1],
+                                 incoming_angle, outgoing_angle])
+
+                # Nudge beam slightly forward to escape hit point
+                x = closest_hit[0] + dx * 0.001
+                y = closest_hit[1] + dy * 0.001
+
+            else:
+                out_x = x + dx * 1000
+                out_y = y + dy * 1000
+                writer.writerow([x, y, out_x, out_y, incoming_angle, "EXIT"])
+                path.append((out_x, out_y))
                 break
-            path.append(closest_hit)
-            reflections += 1
-            x, y = closest_hit
 
-            # Calculate reflection
-            (x1, y1), (x2, y2) = closest_wall
-            wall_dx = x2 - x1
-            wall_dy = y2 - y1
-            wall_length = math.hypot(wall_dx, wall_dy)
-            nx = -wall_dy / wall_length
-            ny = wall_dx / wall_length
-            dot = dx * nx + dy * ny
-            dx -= 2 * dot * nx
-            dy -= 2 * dot * ny
-
-        else:
-            # No hit, beam exits canvas
-            out_x = x + dx * 1000
-            out_y = y + dy * 1000
-            path.append((out_x, out_y))
-            break
-
-    return path, reflections
+    return path
