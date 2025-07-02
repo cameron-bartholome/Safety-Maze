@@ -5,6 +5,7 @@ Handles user interface and canvas rendering.
 
 import tkinter as tk
 from tkinter import ttk
+import csv
 from stages.stage_01_core import get_maze_lines
 from stages.stage_01_core import trace_beam_path
 #-------------------------------------------------------------------------
@@ -82,24 +83,57 @@ def run_stage1_gui():
         for (x1, y1), (x2, y2) in maze_lines:
             canvas.create_line(x1, y1, x2, y2, fill="black", width=2)
 
-        # Get orientation + trace beam
+        # Get orientation and start point
         start = start_points.get(selected, (0, 0))
         orientation = direction_modes.get(selected, "vertical")
-        path, reflections = trace_beam_path(start, angle, maze_lines, canvas_size, orientation)
 
-        # Draw beam path and mark reflections
+        # Run tracer — CSV file will be created
+        trace_beam_path(start, angle, maze_lines, canvas_size, orientation)
+
+        # Read from CSV and draw the beam path
+        path = []
+        with open("results/beam_log.csv", newline='', encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                path.append((float(row["hit_x"]), float(row["hit_y"])))
+
+        # Insert the starting point at the beginning
+        path.insert(0, start)
+
+        # Draw red beam segments
+        for i in range(len(path) - 1):
+            canvas.create_line(*path[i], *path[i + 1], fill="red", width=2)
+
+        # Draw blue dots at hit points (excluding start and final exit)
+        for i in range(1, len(path) - 1):
+            rx, ry = path[i]
+            canvas.create_oval(rx - 4, ry - 4, rx + 4, ry + 4, fill="blue", outline="white")
+
+        # Draw starting point
+        x0, y0 = start
+        canvas.create_oval(x0 - 3, y0 - 3, x0 + 3, y0 + 3, fill="green")
+
+        # Set reflection count
+        reflection_count = max(0, len(path) - 2)
+        reflection_label.config(text=str(reflection_count))
+
+#---------------------------------------------------------------------------------------------------
+        # Draw all red beam segments
         for i in range(len(path) - 1):
             canvas.create_line(*path[i], *path[i+1], fill="red", width=2)
-            if i != 0:  # Only mark reflection points, not the first
-                rx, ry = path[i]
-                canvas.create_oval(rx - 3, ry - 3, rx + 3, ry + 3, fill="blue")
 
+        # Draw blue dots at all hit points (excluding start and final exit)
+        for i in range(1, len(path) - 1):
+            rx, ry = path[i]
+            canvas.create_oval(rx - 4, ry - 4, rx + 4, ry + 4, fill="blue", outline="white")
+
+#---------------------------------------------------------------------------------------------------
         # Draw starting point (green)
         x0, y0 = start
         canvas.create_oval(x0 - 3, y0 - 3, x0 + 3, y0 + 3, fill="green")
 
         # Show reflection count
-        reflection_label.config(text=str(reflections))
+        reflection_label.config(text=str(reflection_count))
 
     # Controls (right)
     control_frame = tk.Frame(main_frame)
