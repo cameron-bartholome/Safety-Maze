@@ -26,6 +26,10 @@ This stage focused on building the basic simulation loop and getting beam reflec
 📦 Finalized: **2025-07-02**  
 📁 Output: `results/beam_log.csv`
 
+## 🖼 Stage 1 Preview
+
+![Stage 1 Beam Simulation Output](assets/stage1-preview.png)
+
 ---
 
 ## 🧪 Stage 2 – Geometry Expansion [Active]
