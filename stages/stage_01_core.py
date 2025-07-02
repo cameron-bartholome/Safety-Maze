@@ -121,7 +121,7 @@ def trace_beam_path(start, angle_deg, maze_lines,
     x, y = start
     path = [start]
 
-    with open("beam_log.csv", mode='w', newline='', encoding='utf-8') as file:
+    with open("results/beam_log.csv", mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(["start_x", "start_y", "hit_x", "hit_y", "angle_in", "angle_out"])
 

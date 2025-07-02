@@ -92,7 +92,7 @@ def run_stage1_gui():
 
         # Read from CSV and draw the beam path
         path = []
-        with open("beam_log.csv", newline='', encoding="utf-8") as file:
+        with open("results/beam_log.csv", newline='', encoding="utf-8") as file:
             reader = csv.DictReader(file)
             for row in reader:
                 path.append((float(row["hit_x"]), float(row["hit_y"])))
