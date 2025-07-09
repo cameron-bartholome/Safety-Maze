@@ -41,8 +41,6 @@ This stage adds dynamic maze shaping and begins expanding simulation depth.
 - [ ] Support editable labyrinth presets
 - [ ] Visualize dimensional changes in the GUI
 - [ ] Load/save maze presets from file
-- [ ] Add optional surface presets (e.g. anodized aluminum)
-- [ ] Support beam width, energy decay per bounce (optional)
 
 ---
 
