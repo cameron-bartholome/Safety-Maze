@@ -217,7 +217,7 @@ The final stage is all about **polishing**, **packaging**, and making it easy fo
 
 ```bash
 pip install shapely
-python gui.py
+python main.py
 ```
 
 1. Select a maze preset  
