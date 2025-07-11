@@ -1,7 +1,7 @@
 # 🔴 Safety Maze – Laser Reflection Simulator
 
 **Safety Maze** is a visual simulation tool that traces laser beams through a 2D maze and shows how they reflect off surfaces.  
-Designed for quick testing, learning, and debugging of beam safety paths using Python + Tkinter.
+Designed for quick testing, learning, and debugging of beam paths using Python + Tkinter.
 
 > ⚠️ **Disclaimer:** This is a solo laser simulation project built while I juggle Python, laser physics, and questionable design decisions.  
 > It’s currently held together with duct tape, Tkinter, and hope.  
