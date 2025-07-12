@@ -31,8 +31,12 @@ direction_modes = {
 }
 
 #-------------------------------------------------------------------------
-def run_stage1_gui():
-    """Launches the Stage 1 GUI window for the Safety Maze application."""
+
+def run_gui(): # DEV-2025-07-12-01 Stage 2 - Launcher Integration Start
+    """
+    Launches the Stage 1 GUI window for the Safety Maze application.
+    Initializes the main window, canvas, and controls for the laser beam simulation.
+    """
 
     root = tk.Tk()
     root.title("Safety Maze Stage 1")
