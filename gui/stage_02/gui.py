@@ -14,7 +14,3 @@ def run_gui():
     print("Launching Stage 2 GUI...")  # Print debug message
     print("[INFO] Stage 2 GUI has started")
 
-
-    with dpg.window(label="Stage 2"):
-        dpg.add_text("This is Stage 2")
-    dpg.show_item("Stage 2")  # optional, but shows it

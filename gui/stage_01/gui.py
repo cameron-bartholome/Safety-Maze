@@ -32,7 +32,7 @@ direction_modes = {
 
 #-------------------------------------------------------------------------
 
-def run_gui(): # DEV-2025-07-12-01 Stage 2 - Launcher Integration Start
+def run_gui(): # 2025-07-13 removed launcher integration
     """
     Launches the Stage 1 GUI window for the Safety Maze application.
     Initializes the main window, canvas, and controls for the laser beam simulation.

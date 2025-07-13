@@ -7,11 +7,17 @@ Launches the Stage 1 GUI for laser beam reflection simulation in a 2D labyrinth.
 Author: CB
 Date: 2025-06-21
 """
-#DEV-2025-07-12-01 Stage 2 - Launcher Integration Start
+import sys
+import os
 
-from launcher.launcher import run_launcher
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from gui.stage_01 import gui
+
+
+
+# --- Launch the GUI ---
 
 print("Launching SafetyMaze...") #test to see it launchers
 
 if __name__ == "__main__":
-    run_launcher()
+    gui.run_gui()  # Launch the Stage 1 GUI
