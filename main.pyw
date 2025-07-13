@@ -11,7 +11,7 @@ Date: 2025-06-21
 
 from launcher.launcher import run_launcher
 
-# print("Launching SafetyMaze...") #test to see it launchers
+print("Launching SafetyMaze...") #test to see it launchers
 
 if __name__ == "__main__":
     run_launcher()
