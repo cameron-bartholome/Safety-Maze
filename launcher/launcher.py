@@ -17,19 +17,24 @@ def launch_stage(stage_name):
     """
     Closes the launcher GUI and launches the selected stage's GUI.
     """
-    dpg.stop_dearpygui()
 
     # -------------------------- STAGE MODULE PATHS --------------------------
 
     module_path = {
         "Stage 1": "gui.stage_01.gui",
-        # "Stage 2": "gui.stage_02.gui",  # Uncomment when stage is ready
-        # "Stage 3": "gui.stage_03.gui",
+        "Stage 2": "gui.stage_02.gui", # DEV-2025-07-13-01 Stage 2 - GUI Layout implementation
+        # "Stage 3": "gui.stage_03.gui", # Uncomment when stage is ready
     }
 
     if stage_name in module_path:
-        gui_module = importlib.import_module(module_path[stage_name])
-        gui_module.run_gui()
+        print(f"[INFO] Attempting to import: {module_path[stage_name]}")
+        try:
+            gui_module = importlib.import_module(module_path[stage_name])
+            print("[INFO] Import success. Destroying context and launching stage...")
+            dpg.destroy_context()  # Properly shut down launcher before loading next stage
+            gui_module.run_gui()
+        except Exception as e:
+            print(f"[ERROR] Failed to launch {stage_name}: {e.__class__.__name__}: {e}")
 
 def run_launcher():
     """
@@ -67,7 +72,7 @@ def run_launcher():
         with dpg.group(horizontal=True):
             stage2_btn = dpg.add_button(label="Launch Stage 2",
                                         width=120, callback=lambda: launch_stage("Stage 2"),
-                                        enabled=False)
+                                        enabled=True) # make true to turn on stage 2, idiot!
             dpg.add_text("Stage 2 - Dynamic Maze (WIP)\nRebuild of UI using DearPyGui," \
             "interactive setup planned.",
                             wrap=440)
