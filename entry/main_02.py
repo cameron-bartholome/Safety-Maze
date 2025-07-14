@@ -8,7 +8,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from gui.stage_02 import gui
+from gui.stage_02.gui import run_gui
 
 if __name__ == "__main__":
     print("Launching Safety Maze Stage 2...")
