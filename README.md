@@ -48,6 +48,12 @@ This stage adds dynamic maze shaping and begins expanding simulation depth.
 - [ ] Visualize dimensional changes in the GUI
 - [ ] Load/save maze presets from file
 
+## 🖼 Stage 2 Preview
+
+Mockup designed loosely in Figma
+
+![Stage 2 Figma layout Mock-up](assets/stage2-figma-mockup.png)
+
 ---
 
 ## 🗺️ Project Roadmap
