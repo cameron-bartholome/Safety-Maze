@@ -8,7 +8,10 @@ The layout is responsive and organized to fit standard desktop resolutions (16:9
 
 import sys
 from PyQt6.QtCore import QSize, Qt
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QHBoxLayout, QVBoxLayout, QLabel
+
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QLabel, QVBoxLayout,
+    QWidget, QHBoxLayout, QFrame, QComboBox, QGroupBox, QLineEdit)
+
 # ignore red error vs code mis-interperating files, can remove later if annoying.
 
 class Stage2MainWindow(QMainWindow):
@@ -57,27 +60,139 @@ class Stage2MainWindow(QMainWindow):
         top_bar.setLayout(top_layout)  # sets layout as we specified above
         self.setMenuWidget(top_bar) # adds widget to main window menu bar
 
+        #----------------------------------------------------------------------------------------
+        def update_dimension_inputs(self, keys):
+            # Clear previous inputs
+            for row in self.dimension_rows:
+                row.setParent(None)
+            self.dimension_rows.clear()
 
+            for key in keys:
+                row = QHBoxLayout()
+
+                label = QLabel(key)
+                input_box = QLineEdit()
+                tolerance_box = QLineEdit()
+
+                input_box.setPlaceholderText("Value")
+                tolerance_box.setPlaceholderText("Tolerance")
+
+                label.setStyleSheet("color: black;")
+                input_box.setStyleSheet("color: black; background-color: white;")
+                tolerance_box.setStyleSheet("color: black; background-color: white;")
+
+                row_container = QFrame()
+                row_layout = QHBoxLayout()
+                row_layout.addWidget(label)
+                row_layout.addWidget(input_box)
+                row_layout.addWidget(tolerance_box)
+                row_container.setLayout(row_layout)
+
+                self.dimension_frame.layout().addWidget(row_container)
+                self.dimension_rows.append(row_container)
+
+        #----------------------------------------------------------------------------------------
 
         # -------- LEFT PANEL: Maze Selection + Inputs --------
-        left_panel = QLabel("Left Panel")
-        left_panel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # DEV-2025-07-17 - Styled Left Panel (text, border, dropdown)
+
+        left_panel = QFrame()
+        left_panel.setFrameShape(QFrame.Shape.Box)
         left_panel.setFixedWidth(250)
-        left_panel.setStyleSheet("color: black; font-weight: bold;")
+        left_panel.setStyleSheet("background-color: #dbeeff;border: 1px solid #ccc;")
 
-        left_panel.setStyleSheet("background-color: #d9eaf7; border: 1px solid #aaa;" \
-        "color: black; font-weight: bold;")
+        left_panel_layout = QVBoxLayout()
+        left_panel_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        left_panel_layout.setContentsMargins(5, 20, 5, 10)  # (left, top, right, bottom)
 
 
+        # Maze Selection GroupBox
+        maze_group = QGroupBox()
+        maze_group.setStyleSheet("background-color: #dbeeff; border: none;")
+        maze_group.setFixedHeight(100)
+
+        maze_group_layout = QVBoxLayout()
+        maze_group_layout.setSpacing(5)
+
+        # Maze selection title
+        maze_label = QLabel("Maze Selection")
+        maze_label.setStyleSheet("font-weight: bold; font-size: 12pt; color: black;")
+        maze_label.setFixedHeight(30)
 
 
-        # --------CENTER PANEL: Maze Viewer / Canvas --------
+        # Maze dropdown
+        maze_selector = QComboBox()
+        maze_selector.addItems([
+            "Maze 1 - Straight",
+            "Maze 2 - L Shape",
+            "Maze 3A - Z Shape",
+            "Maze 3B - U Shape",
+            "Maze 4A - Snake Shape",
+            "Maze 4B - Stair Shape"])
+
+        maze_dimensions = {
+            "Maze 1 - Straight": ["L1", "G1"],
+            "Maze 2 - L": ["L1", "G1", "L2", "G2"],
+            "Maze 3A - Z Shape": ["L1", "G1", "L2", "G2", "L3", "G3"],
+            "Maze 3B - U Shape": ["L1", "G1", "L2", "G2", "L3", "G3"],
+            "Maze 4A - Snake Shape": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"],
+            "Maze 4B - Stair Shape": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"]
+            }
+
+        def on_maze_selected():
+            selection = maze_selector.currentText()
+            keys = maze_dimensions.get(selection, [])
+            self.update_dimension_inputs(keys)
+
+        def updateDimensionInput(self, maze_name):
+        # Placeholder logic, just prints for now
+            print(f"Selected maze: {maze_name}")
+
+
+        maze_selector.currentIndexChanged.connect(on_maze_selected)
+        maze_selector.setStyleSheet("font-size: 10pt; color: black; background-color: white;" \
+        "padding: 4px;")
+
+        maze_selector.setFixedHeight(30)
+
+        # -------- DIMENSIONS SECTION --------
+        dimension_group = QGroupBox("Dimension Inputs (mm)")
+        dimension_layout = QVBoxLayout()
+
+        # Store rows here for updating later
+        self.dimension_rows = []
+
+        # Create a frame to hold dynamic input fields
+        self.dimension_frame = QFrame()
+        self.dimension_frame.setLayout(dimension_layout)
+        self.dimension_frame.setStyleSheet("background-color: #e6f0ff;")
+
+        # Group layout
+        dimension_group_layout = QVBoxLayout()
+        dimension_group_layout.addWidget(self.dimension_frame)
+        dimension_group.setLayout(dimension_group_layout)
+
+        # Add to left panel layout
+        left_panel_layout.addWidget(dimension_group)
+
+        #----------------------------------------------------------------------------------------
+
+        # Add label and dropdown to group
+        maze_group_layout.addWidget(maze_label)
+        maze_group_layout.addWidget(maze_selector)
+        maze_group.setLayout(maze_group_layout)
+
+        left_panel_layout.addWidget(maze_group)
+        left_panel.setLayout(left_panel_layout)
+
+        #----------------------------------------------------------------------------------------
+
+
+        # -------- CENTER PANEL: Maze Drawing Canvas --------
         center_panel = QLabel("Center Viewport")
         center_panel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        center_panel.setStyleSheet("background-color: #eeeeee; border: 1px solid #aaa;" \
+        center_panel.setStyleSheet("background-color: #eeeeee; border: 1px solid #ccc; " \
         "color: black; font-weight: bold;")
-
 
 
 
