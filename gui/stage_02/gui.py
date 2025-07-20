@@ -175,18 +175,49 @@ class Stage2MainWindow(QMainWindow):
             row = QHBoxLayout()
             label = QLabel(f"{key}:")
             value_input = QLineEdit()
-            value_input.setPlaceholderText("Value")
+            value_input.setPlaceholderText("10mm")
             tolerance_input = QLineEdit()
-            tolerance_input.setPlaceholderText("Tolerance")
+            tolerance_input.setPlaceholderText("±0.5mm")
 
+            # Styling
+            label.setStyleSheet("color: black;")  # Label color
+            value_input.setStyleSheet("""QLineEdit {color: black; qproperty-alignment: AlignCenter;}
+                                      QLineEdit::placeholder {color: gray;}""")
+            tolerance_input.setStyleSheet("""QLineEdit {color: black; qproperty-alignment: AlignCenter;}
+                                      QLineEdit::placeholder {color: gray;}""")
             label.setFixedWidth(40)
             value_input.setFixedWidth(100)
             tolerance_input.setFixedWidth(100)
+
+            # Format and validate after focus
+            value_input.editingFinished.connect(
+                lambda v=value_input: v.setText(self.format_mm(v.text())))
+
+            tolerance_input.editingFinished.connect(
+                lambda t=tolerance_input: t.setText(self.format_pm(t.text())))
+
 
             row.addWidget(label)
             row.addWidget(value_input)
             row.addWidget(tolerance_input)
             self.dimension_inputs_layout.addLayout(row)
+
+    # ========== Helper: Format Values with Units ==========
+    def format_mm(self, value: str) -> str:
+        """Appends 'mm' to the numeric value, if valid."""
+        try:
+            float_val = float(value)
+            return f"{float_val:.1f} mm"
+        except ValueError:
+            return value
+
+    def format_pm(self, value: str) -> str:
+        """Appends '±' and 'mm' to the numeric value, if valid."""
+        try:
+            float_val = float(value)
+            return f"±{float_val:.1f} mm"
+        except ValueError:
+            return value
 
 
 
