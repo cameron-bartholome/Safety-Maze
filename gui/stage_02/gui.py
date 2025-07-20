@@ -81,11 +81,11 @@ class Stage2MainWindow(QMainWindow):
         self.maze_selector.addItems([
             "Select a Maze . . .",
             "Maze 1 - Straight",
-            "Maze 2 - L",
-            "Maze 3A - Z",
-            "Maze 3B - U",
-            "Maze 4A - Snake",
-            "Maze 4B - Stair"
+            "Maze 2 - L Shape",
+            "Maze 3A - Z Shape",
+            "Maze 3B - U Shape",
+            "Maze 4A - Snake Shape",
+            "Maze 4B - Stair Shape"
         ])
         self.maze_selector.currentTextChanged.connect(self.on_maze_selected)
 
@@ -142,11 +142,11 @@ class Stage2MainWindow(QMainWindow):
 
         maze_dimensions = {
             "Maze 1 - Straight": ["L1", "G1"],
-            "Maze 2 - L": ["L1", "G1", "L2", "G2"],
-            "Maze 3A - Z": ["L1", "G1", "L2", "G2", "L3", "G3"],
-            "Maze 3B - U": ["L1", "G1", "L2", "G2", "L3", "G3"],
-            "Maze 4A - Snake": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"],
-            "Maze 4B - Stair": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"]
+            "Maze 2 - L Shape": ["L1", "G1", "L2", "G2"],
+            "Maze 3A - Z Shape": ["L1", "G1", "L2", "G2", "L3", "G3"],
+            "Maze 3B - U Shape": ["L1", "G1", "L2", "G2", "L3", "G3"],
+            "Maze 4A - Snake Shape": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"],
+            "Maze 4B - Stair Shape": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"]
         }
         keys = maze_dimensions.get(text, [])
         self.update_dimension_inputs(keys)
