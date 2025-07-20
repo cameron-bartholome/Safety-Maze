@@ -8,222 +8,189 @@ The layout is responsive and organized to fit standard desktop resolutions (16:9
 
 import sys
 from PyQt6.QtCore import QSize, Qt
+from PyQt6.QtWidgets import (
+    QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QComboBox,
+    QFrame, QHBoxLayout, QLineEdit
+)
 
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QLabel, QVBoxLayout,
-    QWidget, QHBoxLayout, QFrame, QComboBox, QGroupBox, QLineEdit)
-
-# ignore red error vs code mis-interperating files, can remove later if annoying.
-
+# ========== Stage 2 Main Window ==========
 class Stage2MainWindow(QMainWindow):
     """
-    Main window class for Stage 2 of the Safety Maze application.
-
-    This window includes:
-    - Top navigation bar to indicate progress through simulation steps.
-    - Left panel for maze selection and input configuration.
-    - Center canvas for maze drawing and laser visualization.
-    - Right panel for laser beam control inputs and results display.
+    Main window for Safety Maze Stage 2.
+    Initializes UI components: top progress bar, left input panel,
+    central canvas placeholder, and right control panel.
     """
 
     def __init__(self):
         super().__init__()
-        # -------- Window Setup --------
-        self.setWindowTitle("Safety Maze Stage 2")
-        self.setFixedSize(QSize(1280, 720))  # 16:9 ratio
-        self.setStyleSheet("background-color: #f8fafc;")  # Tailwind's light gray (near white)
+        self.setWindowTitle("Safety Maze - Stage 2")
+        self.setMinimumSize(QSize(1280, 720))
 
+        # ========== Main Layout Wrapper ==========
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout()
+        central_widget.setLayout(main_layout)
 
-        # -------- TOP: Progress Bar Section --------
-        # DEV-2025-07-14-01 Stage 2 - GUI Layout implementation
-        top_bar = QWidget()
-        top_bar.setFixedHeight(50)
+        # ========== Top Progress Bar ==========
+        top_bar = QFrame()
+        top_bar.setFrameShape(QFrame.Shape.Panel)
+        top_bar.setStyleSheet("background-color: #DDDDDD; color: black; font-weight: bold;")
+
         top_layout = QHBoxLayout()
+        top_layout.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        top_layout.setSpacing(60)
 
-        steps = [
-            "1 Select Maze",
-            "2 Adjust Dimensions",
-            "3 Choose Material",
-            "4 Configure Beam",
-            "5 View Results"
-        ]
+        top_bar.setLayout(top_layout)
+        top_layout.addWidget(QLabel("1. Select Maze"))
+        top_layout.addWidget(QLabel("→"))
+        top_layout.addWidget(QLabel("2. Adjust Geometry"))
+        top_layout.addWidget(QLabel("→"))
+        top_layout.addWidget(QLabel("3. Choose Materials"))
+        top_layout.addWidget(QLabel("→"))
+        top_layout.addWidget(QLabel("4. Configure Beam"))
+        top_layout.addWidget(QLabel("→"))
+        top_layout.addWidget(QLabel("5. View Results"))
+        main_layout.addWidget(top_bar)
 
-        for i, step in enumerate(steps):
-            step_label = QLabel(step)
-            step_label.setStyleSheet("color: #1e293b; font-weight: bold; padding: 4px;")
-            top_layout.addWidget(step_label)
+        # ========== Horizontal Body Layout ==========
+        body_frame = QFrame()
+        body_layout = QHBoxLayout()
+        body_frame.setLayout(body_layout)
+        main_layout.addWidget(body_frame)
 
-            if i < len(steps) - 1:
-                arrow = QLabel("→")
-                arrow.setStyleSheet("color: #94a3b8; padding: 4px;")
-                top_layout.addWidget(arrow)
-
-        top_bar.setLayout(top_layout)  # sets layout as we specified above
-        self.setMenuWidget(top_bar) # adds widget to main window menu bar
-
-        #----------------------------------------------------------------------------------------
-        def update_dimension_inputs(self, keys):
-            # Clear previous inputs
-            for row in self.dimension_rows:
-                row.setParent(None)
-            self.dimension_rows.clear()
-
-            for key in keys:
-                row = QHBoxLayout()
-
-                label = QLabel(key)
-                input_box = QLineEdit()
-                tolerance_box = QLineEdit()
-
-                input_box.setPlaceholderText("Value")
-                tolerance_box.setPlaceholderText("Tolerance")
-
-                label.setStyleSheet("color: black;")
-                input_box.setStyleSheet("color: black; background-color: white;")
-                tolerance_box.setStyleSheet("color: black; background-color: white;")
-
-                row_container = QFrame()
-                row_layout = QHBoxLayout()
-                row_layout.addWidget(label)
-                row_layout.addWidget(input_box)
-                row_layout.addWidget(tolerance_box)
-                row_container.setLayout(row_layout)
-
-                self.dimension_frame.layout().addWidget(row_container)
-                self.dimension_rows.append(row_container)
-
-        #----------------------------------------------------------------------------------------
-
-        # -------- LEFT PANEL: Maze Selection + Inputs --------
-        # DEV-2025-07-17 - Styled Left Panel (text, border, dropdown)
-
+        # ========== Left Panel: Maze Configuration ==========
         left_panel = QFrame()
-        left_panel.setFrameShape(QFrame.Shape.Box)
-        left_panel.setFixedWidth(250)
-        left_panel.setStyleSheet("background-color: #dbeeff;border: 1px solid #ccc;")
+        left_panel.setFrameShape(QFrame.Shape.Panel)
+        left_panel.setStyleSheet("background-color: #F5F5F5; border: 1px solid gray;")
+        left_panel.setFixedWidth(300)
+        left_layout = QVBoxLayout()
+        left_panel.setLayout(left_layout)
 
-        left_panel_layout = QVBoxLayout()
-        left_panel_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        left_panel_layout.setContentsMargins(5, 20, 5, 10)  # (left, top, right, bottom)
+        # Maze Selection Section
+        maze_group = QFrame()
+        maze_group.setFrameShape(QFrame.Shape.Panel)
+        maze_group.setStyleSheet("background-color: #FFFFFF; border: 1px solid #AAA;")
+        maze_layout = QVBoxLayout()
+        maze_group.setLayout(maze_layout)
 
-
-        # Maze Selection GroupBox
-        maze_group = QGroupBox()
-        maze_group.setStyleSheet("background-color: #dbeeff; border: none;")
-        maze_group.setFixedHeight(100)
-
-        maze_group_layout = QVBoxLayout()
-        maze_group_layout.setSpacing(5)
-
-        # Maze selection title
         maze_label = QLabel("Maze Selection")
-        maze_label.setStyleSheet("font-weight: bold; font-size: 12pt; color: black;")
-        maze_label.setFixedHeight(30)
-
-
-        # Maze dropdown
-        maze_selector = QComboBox()
-        maze_selector.addItems([
+        maze_label.setStyleSheet("color: black; font-weight: bold")
+        self.maze_selector = QComboBox()
+        self.maze_selector.setStyleSheet("color: black")
+        self.maze_selector.addItems([
+            "Select a Maze . . .",
             "Maze 1 - Straight",
-            "Maze 2 - L Shape",
-            "Maze 3A - Z Shape",
-            "Maze 3B - U Shape",
-            "Maze 4A - Snake Shape",
-            "Maze 4B - Stair Shape"])
+            "Maze 2 - L",
+            "Maze 3A - Z",
+            "Maze 3B - U",
+            "Maze 4A - Snake",
+            "Maze 4B - Stair"
+        ])
+        self.maze_selector.currentTextChanged.connect(self.on_maze_selected)
+
+        maze_layout.addWidget(maze_label)
+        maze_layout.addWidget(self.maze_selector)
+
+        # Dimension Input Section
+        dimension_group = QFrame()
+        dimension_group.setFrameShape(QFrame.Shape.Panel)
+        dimension_group.setStyleSheet("background-color: #FFFFFF; border: 1px solid #AAA")
+        self.dimension_inputs_layout = QVBoxLayout()
+        dimension_group.setLayout(self.dimension_inputs_layout)
+
+        # Add to left panel
+        left_layout.addWidget(maze_group)
+        left_layout.addWidget(dimension_group)
+        left_layout.addStretch()
+
+        # ========== Central Panel ==========
+        central_panel = QFrame()
+        central_panel.setStyleSheet("background-color: #FFFFFF; color: black; " \
+        "border: 1px solid gray;")
+        central_layout = QVBoxLayout()
+        central_panel.setLayout(central_layout)
+        label = QLabel("[ Maze Viewport Placeholder ]")
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        central_layout.addWidget(label)
+
+        # ========== Right Panel ==========
+        right_panel = QFrame()
+        right_panel.setFrameShape(QFrame.Shape.Panel)
+        right_panel.setStyleSheet("background-color: #F5F5F5; color: black; " \
+        "border: 1px solid gray;")
+        right_panel.setFixedWidth(300)
+        right_layout = QVBoxLayout()
+        right_panel.setLayout(right_layout)
+        label = QLabel("[ Laser Controls Section ]")
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        right_layout.addWidget(label)
+        right_layout.addStretch()
+
+        # Add panels to body layout
+        body_layout.addWidget(left_panel)
+        body_layout.addWidget(central_panel)
+        body_layout.addWidget(right_panel)
+
+    # ========== Maze Selection Handler ==========
+    def on_maze_selected(self, text):
+        """
+        Triggered when a maze is selected from the drop-down.
+        Retrieves the required dimension keys based on selection
+        and updates the dynamic input fields accordingly.
+        """
 
         maze_dimensions = {
             "Maze 1 - Straight": ["L1", "G1"],
             "Maze 2 - L": ["L1", "G1", "L2", "G2"],
-            "Maze 3A - Z Shape": ["L1", "G1", "L2", "G2", "L3", "G3"],
-            "Maze 3B - U Shape": ["L1", "G1", "L2", "G2", "L3", "G3"],
-            "Maze 4A - Snake Shape": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"],
-            "Maze 4B - Stair Shape": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"]
-            }
+            "Maze 3A - Z": ["L1", "G1", "L2", "G2", "L3", "G3"],
+            "Maze 3B - U": ["L1", "G1", "L2", "G2", "L3", "G3"],
+            "Maze 4A - Snake": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"],
+            "Maze 4B - Stair": ["L1", "G1", "L2", "G2", "L3", "G3", "L4", "G4", "L5", "G5"]
+        }
+        keys = maze_dimensions.get(text, [])
+        self.update_dimension_inputs(keys)
 
-        def on_maze_selected():
-            selection = maze_selector.currentText()
-            keys = maze_dimensions.get(selection, [])
-            self.update_dimension_inputs(keys)
+    # ========== Dynamic Dimension Input Updater ==========
+    def update_dimension_inputs(self, keys):
+        """
+        Clears and rebuilds the dimension input fields
+        based on the selected maze's requirements.
+        Each row includes a label, value input, and tolerance input.
+        """
 
-        def updateDimensionInput(self, maze_name):
-        # Placeholder logic, just prints for now
-            print(f"Selected maze: {maze_name}")
+        for i in reversed(range(self.dimension_inputs_layout.count())):
+            item = self.dimension_inputs_layout.itemAt(i)
+            if item.layout():
+                # Clear layout recursively
+                while item.layout().count():
+                    sub_item = item.layout().takeAt(0)
+                    if sub_item.widget():
+                        sub_item.widget().deleteLater()
+                self.dimension_inputs_layout.removeItem(item)
+            elif item.widget():
+                item.widget().deleteLater()
 
+        for key in keys:
+            row = QHBoxLayout()
+            label = QLabel(f"{key}:")
+            value_input = QLineEdit()
+            value_input.setPlaceholderText("Value")
+            tolerance_input = QLineEdit()
+            tolerance_input.setPlaceholderText("Tolerance")
 
-        maze_selector.currentIndexChanged.connect(on_maze_selected)
-        maze_selector.setStyleSheet("font-size: 10pt; color: black; background-color: white;" \
-        "padding: 4px;")
+            label.setFixedWidth(40)
+            value_input.setFixedWidth(100)
+            tolerance_input.setFixedWidth(100)
 
-        maze_selector.setFixedHeight(30)
-
-        # -------- DIMENSIONS SECTION --------
-        dimension_group = QGroupBox("Dimension Inputs (mm)")
-        dimension_layout = QVBoxLayout()
-
-        # Store rows here for updating later
-        self.dimension_rows = []
-
-        # Create a frame to hold dynamic input fields
-        self.dimension_frame = QFrame()
-        self.dimension_frame.setLayout(dimension_layout)
-        self.dimension_frame.setStyleSheet("background-color: #e6f0ff;")
-
-        # Group layout
-        dimension_group_layout = QVBoxLayout()
-        dimension_group_layout.addWidget(self.dimension_frame)
-        dimension_group.setLayout(dimension_group_layout)
-
-        # Add to left panel layout
-        left_panel_layout.addWidget(dimension_group)
-
-        #----------------------------------------------------------------------------------------
-
-        # Add label and dropdown to group
-        maze_group_layout.addWidget(maze_label)
-        maze_group_layout.addWidget(maze_selector)
-        maze_group.setLayout(maze_group_layout)
-
-        left_panel_layout.addWidget(maze_group)
-        left_panel.setLayout(left_panel_layout)
-
-        #----------------------------------------------------------------------------------------
-
-
-        # -------- CENTER PANEL: Maze Drawing Canvas --------
-        center_panel = QLabel("Center Viewport")
-        center_panel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        center_panel.setStyleSheet("background-color: #eeeeee; border: 1px solid #ccc; " \
-        "color: black; font-weight: bold;")
+            row.addWidget(label)
+            row.addWidget(value_input)
+            row.addWidget(tolerance_input)
+            self.dimension_inputs_layout.addLayout(row)
 
 
 
-        # -------- RIGHT PANEL: Laser Controls + Results --------
-        right_panel = QLabel("Laser Controls")
-        right_panel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        right_panel.setFixedWidth(250)
-
-        right_panel.setStyleSheet("background-color: #fbe6d4; border: 1px solid #aaa;" \
-        "color: black; font-weight: bold;")
-
-
-
-        # -------- COMBINE PANELS INTO MAIN LAYOUT --------
-        central_widget = QWidget()
-        central_layout = QVBoxLayout()
-        central_widget.setLayout(central_layout)
-        self.setCentralWidget(central_widget)
-
-        central_layout.addWidget(top_bar)
-
-        body_layout = QHBoxLayout()
-        body_layout.addWidget(left_panel)
-        body_layout.addWidget(center_panel, stretch=1)
-        body_layout.addWidget(right_panel)
-
-        central_layout.addLayout(body_layout)
-
-
-
-#------------------------------------------------------------------------------------------
+# ========== Launch GUI ==========
 
 def run_gui():
     """
